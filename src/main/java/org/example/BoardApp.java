@@ -6,8 +6,6 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class BoardApp {
-    LocalDateTime now = LocalDateTime.now();
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss");
     Scanner scan = new Scanner(System.in);
     int latestArticleId = 4; // 시작 번호를 1로 지정
     ArrayList<Article> articleList = new ArrayList<>(); // 인스턴스 변수
@@ -18,7 +16,8 @@ public class BoardApp {
 
         testMask();
 
-        while (true) { // 반복 조건이 true이기 때문에 무한 반복
+        label:
+        while (true) { // 반복 조건이 true 이기 때문에 무한 반복
 
             System.out.print("명령어");
             if (loggedInUser != null) {
@@ -27,41 +26,50 @@ public class BoardApp {
             System.out.print(" : ");
             String cmd = scan.nextLine();
 
-            if (cmd.equals("exit")) { // 숫자가 아닌 경우 같다라는 표현을 할 때 == 이 아닌 .equals()를 사용해야 한다.
-                System.out.println("프로그램을 종료합니다.");
-                break; // 반복문 탈출
+            switch (cmd) {
+                case "exit":  // 숫자가 아닌 경우 같다라는 표현을 할 때 == 이 아닌 .equals()를 사용해야 한다.
+                    System.out.println("프로그램을 종료합니다.");
+                    break label; // 반복문 탈출
 
-            } else if (cmd.equals("add")) {
+                case "add":
 
-                add();
+                    add();
 
-            } else if (cmd.equals("list")) {
+                    break;
+                case "list":
 
-                list();
+                    list();
 
-            } else if (cmd.equals("update")) {
+                    break;
+                case "update":
 
-                update();
+                    update();
 
-            } else if (cmd.equals("delete")) {
+                    break;
+                case "delete":
 
-                delete();
+                    delete();
 
-            } else if (cmd.equals("detail")) {
+                    break;
+                case "detail":
 
-                detail();
+                    detail();
 
-            } else if (cmd.equals("search")) {
+                    break;
+                case "search":
 
-                search();
-            } else if (cmd.equals("signup")) {
+                    search();
+                    break;
+                case "signup":
 
-                signup();
+                    signup();
 
-            } else if (cmd.equals("login")) {
+                    break;
+                case "login":
 
-                login();
+                    login();
 
+                    break;
             }
         }
     }
@@ -102,9 +110,7 @@ public class BoardApp {
     }
 
     public void printArticleList(ArrayList<Article> targetList) {
-        for (int i = 0; i < targetList.size(); i++) {
-
-            Article article = targetList.get(i);
+        for (Article article : targetList) {
 
             System.out.println("번호 : " + article.getId());
             System.out.printf("제목 : %s\n", article.getTitle());
@@ -119,16 +125,14 @@ public class BoardApp {
 
         ArrayList<Article> searchedList = new ArrayList<>();
 
-        for (int i = 0; i < articleList.size(); i++) {
-            Article article = articleList.get(i);
+        for (Article article : articleList) {
             if (article.getTitle().contains(keyword)) {
                 searchedList.add(article);
             }
         }
         if (loggedInUser != null) {
             ArrayList<Article> userArticles = loggedInUser.getArticleList();
-            for (int i = 0; i < userArticles.size(); i++) {
-                Article article = userArticles.get(i);
+            for (Article article : userArticles) {
                 if (article.getTitle().contains(keyword)) {
                     searchedList.add(article);
                 }
@@ -204,14 +208,14 @@ public class BoardApp {
             switch (choice) {
                 case 1:
                     System.out.print("댓글을 입력하세요 : ");
-                    String commets = scan.nextLine();
+                    String comments = scan.nextLine();
                     String commentRegDay = getCurrentDateTime();
 
                     if (commentsList == null) {
                         commentsList = new ArrayList<>();
                         article.setComments(commentsList);
                     }
-                    article.addComment(commets, commentRegDay);
+                    article.addComment(comments, commentRegDay);
                     System.out.println("댓글 등록이 완료되었습니다.");
 
                     break;
@@ -229,7 +233,7 @@ public class BoardApp {
                     System.out.print("수정하실 내용을 입력해주세요 : ");
                     String updateBody = scan.nextLine();
                     article.setBody(updateBody);
-                    System.out.println(loggedInUser.getNickname() + "님의" + inputId + "번 게시물 수정이 완료되었습니다.");
+                    System.out.println(loggedInUser.getNickname() + "님의 " + inputId + "번 게시물 수정이 완료되었습니다.");
 
                     break;
 
@@ -238,7 +242,7 @@ public class BoardApp {
                     String answer = scan.nextLine();
                     if (answer.equals("y")) {
                         userArticles.remove(index);
-                        System.out.println(loggedInUser.getNickname() + "님의" + inputId + "번 게시물을 삭제했습니다.");
+                        System.out.println(loggedInUser.getNickname() + "님의 " + inputId + "번 게시물을 삭제했습니다.");
                     }
                     else if (answer.equals("n")) {
                         System.out.println("삭제를 취소합니다.");
@@ -247,7 +251,6 @@ public class BoardApp {
 
                 case 5:
                     System.out.println("목록으로 돌아갑니다.");
-                    return;
             }
         }
         else {
@@ -282,14 +285,14 @@ public class BoardApp {
             switch (choice) {
                 case 1:
                     System.out.print("댓글을 입력하세요 : ");
-                    String commets = scan.nextLine();
+                    String comments = scan.nextLine();
                     String commentRegDay = getCurrentDateTime();
 
                     if (commentsList == null) {
                         commentsList = new ArrayList<>();
                         article.setComments(commentsList);
                     }
-                    article.addComment(commets, commentRegDay);
+                    article.addComment(comments, commentRegDay);
                     System.out.println("댓글 등록이 완료되었습니다.");
 
                     break;
@@ -326,7 +329,6 @@ public class BoardApp {
 
                 case 5:
                     System.out.println("목록으로 돌아갑니다.");
-                    return;
             }
         }
 
@@ -366,14 +368,13 @@ public class BoardApp {
         // 모든 매개변수를 받는 생성자 이용
 
 
+        Article article = new Article(latestArticleId, title, body, 0, 0, regDate);
         if (loggedInUser != null) {
 
-            Article article = new Article(latestArticleId, title, body, 0, 0, regDate);
             loggedInUser.addArtcleList(article);
         }
         else {
 
-            Article article = new Article(latestArticleId, title, body, 0, 0, regDate);
             articleList.add(article);
         }
         System.out.println("게시물이 등록되었습니다.");
@@ -391,8 +392,7 @@ public class BoardApp {
                 System.out.println("작성한 게시물이 없습니다.");
 
             } else {
-                for (int i = 0; i < userArticles.size(); i++) {
-                    Article article = userArticles.get(i);
+                for (Article article : userArticles) {
                     System.out.println("번호 : " + article.getId());
                     System.out.println("제목 : " + article.getTitle());
                     System.out.println("등록 날짜 : " + article.getRegDate());
@@ -404,9 +404,8 @@ public class BoardApp {
         }
         else {
 
-            for (int i = 0; i < articleList.size(); i++) {
+            for (Article article : articleList) {
 
-                Article article = articleList.get(i);
                 System.out.println("번호 : " + article.getId());
                 System.out.println("제목 : " + article.getTitle());
                 System.out.println("등록 날짜 : " + article.getRegDate());
@@ -434,12 +433,12 @@ public class BoardApp {
 
         ArrayList<Article> userArticles = loggedInUser.getArticleList();
             Article target = userArticles.get(index);
-            target.setTitle(newTitle); // target은 참조값이므로 직접 객체를 접근하여 수정 가능
+            target.setTitle(newTitle); // target 은 참조값이므로 직접 객체를 접근하여 수정 가능
             target.setBody(newBody);
         }
         else {
             Article target = articleList.get(index);
-            target.setTitle(newTitle); // target은 참조값이므로 직접 객체를 접근하여 수정 가능
+            target.setTitle(newTitle); // target 은 참조값이므로 직접 객체를 접근하여 수정 가능
             target.setBody(newBody);
         }
         System.out.printf("%d번 게시물이 수정되었습니다.\n", inputId);
@@ -459,7 +458,6 @@ public class BoardApp {
                     return i; // 원하는 것은 찾은 즉시 종료.
                 }
             }
-            return -1;
         }
         else {
             for (int i = 0; i < articleList.size(); i++) {
@@ -469,8 +467,8 @@ public class BoardApp {
                     return i; // 원하는 것은 찾은 즉시 종료.
                 }
             }
-            return -1;
         }
+        return -1;
     }
 
     public String getCurrentDateTime() {
@@ -480,8 +478,6 @@ public class BoardApp {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss");
 
         // 지정한 형식으로 날짜와 시간을 출력합니다.
-        String formattedDate = now.format(formatter);
-
-        return formattedDate;
+        return now.format(formatter);
     }
 }
