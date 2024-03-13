@@ -12,16 +12,20 @@ public class Article {
     private int view; // 조회수
     private int hit; // 추천수
     private ArrayList<Comments> comments;
-    public void addComment (String comment, String commentRegDate) {
+
+    public void addComment(String comment, String commentRegDate) {
         Comments newComment = new Comments(comment, commentRegDate);
         comments.add(newComment);
     }
+
     public ArrayList<Comments> getComments() {
         return comments;
     }
+
     public void setComments(ArrayList<Comments> comments) {
         this.comments = comments;
     }
+
     public Article() {
     }
 
@@ -34,58 +38,74 @@ public class Article {
         this.view = view;
         this.hit = hit;
     }
+
     public int getId() {
 
         return id;
     }
+
     public void setId(int id) {
 
         this.id = id;
     }
+
     public String getTitle() {
 
         return title;
     }
+
     public void setTitle(String title) {
 
         this.title = title;
     }
+
     public String getBody() {
 
         return body;
     }
+
     public void setBody(String body) {
         this.body = body;
     }
-    public void increaceHit () {
+
+    public void increaceHit() {
         this.hit++;
     }
+
     public int getHit() {
         return hit;
     }
+
     public void setHit(int hit) {
         this.hit = hit;
     }
+
     public String getRegDate() {
         return regDate;
     }
+
     public void setRegDate(String regDate) {
         this.regDate = regDate;
     }
+
     public void increaseView() {
         this.view++;
     }
+
     public int getView() {
         return view;
     }
+
     public void setView(int views) {
         this.view = views;
     }
 }
+
 class Comments {
     String comments;
     String commentsRegDate;
-    public Comments () {
+
+    public Comments() {
 
     }
 
@@ -97,13 +117,15 @@ class Comments {
         this.commentsRegDate = commentsRegDate;
     }
 
-    public Comments (String comments, String commentsRegDate){
+    public Comments(String comments, String commentsRegDate) {
         this.comments = comments;
         this.commentsRegDate = commentsRegDate;
     }
+
     public String getComments() {
         return comments;
     }
+
     public void setComments(String comments) {
         this.comments = comments;
     }

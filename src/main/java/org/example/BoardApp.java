@@ -77,6 +77,7 @@ public class BoardApp {
             if (customer.getId().equals(id) && customer.getPassword().equals(password)) {
                 loggedInUser = customer;
                 System.out.println(loggedInUser.getNickname() + "님 환영합니다!");
+                testMask();
                 return;
             }
         }
@@ -124,7 +125,16 @@ public class BoardApp {
                 searchedList.add(article);
             }
         }
-        printArticleList(searchedList);
+        if (loggedInUser != null) {
+            ArrayList<Article> userArticles = loggedInUser.getArticleList();
+            for (int i = 0; i < userArticles.size(); i++) {
+                Article article = userArticles.get(i);
+                if (article.getTitle().contains(keyword)) {
+                    searchedList.add(article);
+                }
+                printArticleList(searchedList);
+            }
+        }
     }
 
     private void testMask() {
@@ -133,9 +143,20 @@ public class BoardApp {
         Article a2 = new Article(2, "자바 질문좀 할게요~", "질문", 0, 0, getCurrentDateTime());
         Article a3 = new Article(3, "정처기 따야되나요?", "문의", 0, 0, getCurrentDateTime());
 
-        articleList.add(a1);
-        articleList.add(a2);
-        articleList.add(a3);
+
+        if (loggedInUser != null){
+            ArrayList<Article> userArticles = loggedInUser.getArticleList();
+            userArticles.add(a1);
+            userArticles.add(a2);
+            userArticles.add(a3);
+
+        }
+
+        else {
+            articleList.add(a1);
+            articleList.add(a2);
+            articleList.add(a3);
+        }
     }
 
     private void detail() {
@@ -149,62 +170,164 @@ public class BoardApp {
             System.out.println("없는 게시물입니다.");
             return;
         }
-        Article article = articleList.get(index);
-        article.increaseView();
-        ArrayList<Comments> commentsList = article.getComments();
+        if (loggedInUser != null) {
 
-        // alt + ctrl + L : 코드 정리. 자주 사용할 것
-        System.out.println("====================");
-        System.out.println("번호 : " + article.getId());
-        System.out.println("제목 : " + article.getTitle());
-        System.out.println("내용 : " + article.getBody());
-        System.out.println("등록 날짜 : " + article.getRegDate());
-        System.out.println("조회수 : " + article.getView());
-        if (article.getHit() < 0) {
-            System.out.println("추천수 : " + article.getHit());
-        }
-        System.out.println("====================");
-        if (commentsList != null) {
-            System.out.println("======= 댓글 =======");
-            for (Comments comment : commentsList) {
-                System.out.println("댓글 내용 : " + comment.getComments());
-                System.out.println("댓글 등록 날짜 : " + comment.getCommentsRegDate());
-                System.out.println("====================");
+            ArrayList<Article> userArticles = loggedInUser.getArticleList();
+
+            Article article = userArticles.get(index);
+            article.increaseView();
+            ArrayList<Comments> commentsList = article.getComments();
+
+            // alt + ctrl + L : 코드 정리. 자주 사용할 것
+            System.out.println("====================");
+            System.out.println("번호 : " + article.getId());
+            System.out.println("제목 : " + article.getTitle());
+            System.out.println("내용 : " + article.getBody());
+            System.out.println("등록 날짜 : " + article.getRegDate());
+            System.out.println("조회수 : " + article.getView());
+            if (article.getHit() > 0) {
+                System.out.println("추천수 : " + article.getHit());
+            }
+            System.out.println("====================");
+            if (commentsList != null) {
+                System.out.println("======= 댓글 =======");
+                for (Comments comment : commentsList) {
+                    System.out.println("댓글 내용 : " + comment.getComments());
+                    System.out.println("댓글 등록 날짜 : " + comment.getCommentsRegDate());
+                    System.out.println("====================");
+                }
+            }
+
+            System.out.println("상세보기 기능을 선택해주세요.\n1. 댓글 등록\n2. 추천\n3. 수정\n4. 삭제\n5. 목록으로");
+            int choice = Integer.parseInt(scan.nextLine());
+
+            switch (choice) {
+                case 1:
+                    System.out.print("댓글을 입력하세요 : ");
+                    String commets = scan.nextLine();
+                    String commentRegDay = getCurrentDateTime();
+
+                    if (commentsList == null) {
+                        commentsList = new ArrayList<>();
+                        article.setComments(commentsList);
+                    }
+                    article.addComment(commets, commentRegDay);
+                    System.out.println("댓글 등록이 완료되었습니다.");
+
+                    break;
+
+                case 2:
+                    article.increaceHit();
+                    System.out.println("추천 되었습니다.");
+
+                    break;
+
+                case 3:
+                    System.out.print("수정하실 제목을 입력해주세요 : ");
+                    String updateTitle = scan.nextLine();
+                    article.setTitle(updateTitle);
+                    System.out.print("수정하실 내용을 입력해주세요 : ");
+                    String updateBody = scan.nextLine();
+                    article.setBody(updateBody);
+                    System.out.println(loggedInUser.getNickname() + "님의" + inputId + "번 게시물 수정이 완료되었습니다.");
+
+                    break;
+
+                case 4:
+                    System.out.print("삭제 하시겠습니까? (y/n) : ");
+                    String answer = scan.nextLine();
+                    if (answer.equals("y")) {
+                        userArticles.remove(index);
+                        System.out.println(loggedInUser.getNickname() + "님의" + inputId + "번 게시물을 삭제했습니다.");
+                    }
+                    else if (answer.equals("n")) {
+                        System.out.println("삭제를 취소합니다.");
+                    }
+                    break;
+
+                case 5:
+                    System.out.println("목록으로 돌아갑니다.");
+                    return;
             }
         }
+        else {
+            Article article = articleList.get(index);
+            article.increaseView();
+            ArrayList<Comments> commentsList = article.getComments();
 
-        System.out.println("상세보기 기능을 선택해주세요.\n1. 댓글 등록\n2. 추천\n3. 수정\n4. 삭제\n5. 목록으로");
-        int choice = Integer.parseInt(scan.nextLine());
-
-        switch (choice) {
-            case 1:
-                System.out.print("댓글을 입력하세요 : ");
-                String commets = scan.nextLine();
-                String commentRegDay = getCurrentDateTime();
-
-                if (commentsList == null) {
-                    commentsList = new ArrayList<>();
-                    article.setComments(commentsList);
+            // alt + ctrl + L : 코드 정리. 자주 사용할 것
+            System.out.println("====================");
+            System.out.println("번호 : " + article.getId());
+            System.out.println("제목 : " + article.getTitle());
+            System.out.println("내용 : " + article.getBody());
+            System.out.println("등록 날짜 : " + article.getRegDate());
+            System.out.println("조회수 : " + article.getView());
+            if (article.getHit() > 0) {
+                System.out.println("추천수 : " + article.getHit());
+            }
+            System.out.println("====================");
+            if (commentsList != null) {
+                System.out.println("======= 댓글 =======");
+                for (Comments comment : commentsList) {
+                    System.out.println("댓글 내용 : " + comment.getComments());
+                    System.out.println("댓글 등록 날짜 : " + comment.getCommentsRegDate());
+                    System.out.println("====================");
                 }
-                article.addComment(commets, commentRegDay);
-                System.out.println("댓글 등록이 완료되었습니다.");
+            }
 
-                break;
 
-            case 2:
-                article.increaceHit();
-                System.out.println("추천 되었습니다.");
+            System.out.println("상세보기 기능을 선택해주세요.\n1. 댓글 등록\n2. 추천\n3. 수정\n4. 삭제\n5. 목록으로");
+            int choice = Integer.parseInt(scan.nextLine());
 
-                break;
+            switch (choice) {
+                case 1:
+                    System.out.print("댓글을 입력하세요 : ");
+                    String commets = scan.nextLine();
+                    String commentRegDay = getCurrentDateTime();
 
-            case 3:
-                System.out.print("수정하실 제목을 입력해주세요 : ");
-                String updateTitle = scan.nextLine();
-                article.setTitle(updateTitle);
-                System.out.print("수정하실 내용을 입력해주세요 : ");
-                String updateBody = scan.nextLine();
-                article.setBody(updateBody);
-                System.out.println(index + "번 게시물 수정이 완료되었습니다.");
+                    if (commentsList == null) {
+                        commentsList = new ArrayList<>();
+                        article.setComments(commentsList);
+                    }
+                    article.addComment(commets, commentRegDay);
+                    System.out.println("댓글 등록이 완료되었습니다.");
+
+                    break;
+
+                case 2:
+                    article.increaceHit();
+                    System.out.println("추천 되었습니다.");
+
+                    break;
+
+                case 3:
+                    System.out.print("수정하실 제목을 입력해주세요 : ");
+                    String updateTitle = scan.nextLine();
+                    article.setTitle(updateTitle);
+                    System.out.print("수정하실 내용을 입력해주세요 : ");
+                    String updateBody = scan.nextLine();
+                    article.setBody(updateBody);
+                    System.out.println(inputId + "번 게시물 수정이 완료되었습니다.");
+
+                    break;
+
+                case 4:
+                    System.out.print("삭제 하시겠습니까? (y/n) : ");
+                    String answer = scan.nextLine();
+                    if (answer.equals("y")) {
+                        articleList.remove(index);
+                        System.out.println(inputId + "번 게시물을 삭제했습니다.");
+                    }
+                    else if (answer.equals("n")) {
+                        System.out.println("삭제를 취소합니다.");
+                    }
+
+                    break;
+
+                case 5:
+                    System.out.println("목록으로 돌아갑니다.");
+                    return;
+            }
         }
 
 
@@ -220,9 +343,16 @@ public class BoardApp {
             System.out.println("없는 게시물입니다.");
             return;
         }
+        if (loggedInUser != null){
+            ArrayList<Article> userArticles = loggedInUser.getArticleList();
+            userArticles.remove(index);
+        }
+        else {
+            articleList.remove(index);
+        }
 
-        articleList.remove(index);
-        System.out.printf("%d 게시물이 삭제되었습니다.\n", inputId);
+        System.out.printf("%d번 게시물이 삭제되었습니다.\n", inputId);
+
     }
 
     private void add() {
@@ -240,7 +370,8 @@ public class BoardApp {
 
             Article article = new Article(latestArticleId, title, body, 0, 0, regDate);
             loggedInUser.addArtcleList(article);
-        } else {
+        }
+        else {
 
             Article article = new Article(latestArticleId, title, body, 0, 0, regDate);
             articleList.add(article);
@@ -251,19 +382,6 @@ public class BoardApp {
 
     public void list() {
         System.out.println("====================");
-
-        for (int i = 0; i < articleList.size(); i++) {
-
-            Article article = articleList.get(i);
-            System.out.println("번호 : " + article.getId());
-            System.out.println("제목 : " + article.getTitle());
-            if (article.getRegDate() != null) {
-
-                System.out.println("등록 날짜 : " + article.getRegDate());
-                System.out.println("====================");
-            }
-        }
-
         if (loggedInUser != null) {
 
             ArrayList<Article> userArticles = loggedInUser.getArticleList();
@@ -273,17 +391,26 @@ public class BoardApp {
                 System.out.println("작성한 게시물이 없습니다.");
 
             } else {
-
-                for (Article article : userArticles) {
-
+                for (int i = 0; i < userArticles.size(); i++) {
+                    Article article = userArticles.get(i);
                     System.out.println("번호 : " + article.getId());
                     System.out.println("제목 : " + article.getTitle());
-                    if (article.getRegDate() != null) {
-                        System.out.println("등록 날짜 : " + article.getRegDate());
-                        System.out.println("====================");
+                    System.out.println("등록 날짜 : " + article.getRegDate());
+                    System.out.println("====================");
 
-                    }
                 }
+            }
+
+        }
+        else {
+
+            for (int i = 0; i < articleList.size(); i++) {
+
+                Article article = articleList.get(i);
+                System.out.println("번호 : " + article.getId());
+                System.out.println("제목 : " + article.getTitle());
+                System.out.println("등록 날짜 : " + article.getRegDate());
+                System.out.println("====================");
             }
         }
     }
@@ -297,17 +424,24 @@ public class BoardApp {
             System.out.println("없는 게시물입니다.");
             return;
         }
-
         System.out.print("새로운 제목을 입력해주세요 : ");
         String newTitle = scan.nextLine();
 
         System.out.print("새로운 내용을 입력해주세요 : ");
         String newBody = scan.nextLine();
 
-        Article target = articleList.get(index);
-        target.setTitle(newTitle); // target은 참조값이므로 직접 객체를 접근하여 수정 가능
-        target.setBody(newBody);
+        if (loggedInUser != null){
 
+        ArrayList<Article> userArticles = loggedInUser.getArticleList();
+            Article target = userArticles.get(index);
+            target.setTitle(newTitle); // target은 참조값이므로 직접 객체를 접근하여 수정 가능
+            target.setBody(newBody);
+        }
+        else {
+            Article target = articleList.get(index);
+            target.setTitle(newTitle); // target은 참조값이므로 직접 객체를 접근하여 수정 가능
+            target.setBody(newBody);
+        }
         System.out.printf("%d번 게시물이 수정되었습니다.\n", inputId);
 
     }
@@ -317,14 +451,15 @@ public class BoardApp {
     public int findIndexById(int id) {
 
         if (loggedInUser != null) {
-            for (int i = 0; i < loggedInUser.articleList.size(); i++) {
-                Article userArticle = loggedInUser.articleList.get(i);
+            ArrayList<Article> userArticles = loggedInUser.getArticleList();
+            for (int i = 0; i < userArticles.size(); i++) {
+                Article article = userArticles.get(i);
 
-                if (userArticle.getId() == id) {
-                    return i;
+                if (article.getId() == id) {
+                    return i; // 원하는 것은 찾은 즉시 종료.
                 }
             }
-           return -1;
+            return -1;
         }
         else {
             for (int i = 0; i < articleList.size(); i++) {
