@@ -316,14 +316,26 @@ public class BoardApp {
     // 출력 : 게시물 번호에 해당하는 인덱스
     public int findIndexById(int id) {
 
-        for (int i = 0; i < articleList.size(); i++) {
-            Article article = articleList.get(i);
+        if (loggedInUser != null) {
+            for (int i = 0; i < loggedInUser.articleList.size(); i++) {
+                Article userArticle = loggedInUser.articleList.get(i);
 
-            if (article.getId() == id) {
-                return i; // 원하는 것은 찾은 즉시 종료.
+                if (userArticle.getId() == id) {
+                    return i;
+                }
             }
+           return -1;
         }
-        return -1;
+        else {
+            for (int i = 0; i < articleList.size(); i++) {
+                Article article = articleList.get(i);
+
+                if (article.getId() == id) {
+                    return i; // 원하는 것은 찾은 즉시 종료.
+                }
+            }
+            return -1;
+        }
     }
 
     public String getCurrentDateTime() {
