@@ -8,9 +8,11 @@ import java.util.Scanner;
 public class BoardApp {
     Scanner scan = new Scanner(System.in);
     int latestArticleId = 4; // 시작 번호를 1로 지정
+    int WRONG_VALUE = -1;
     ArrayList<Article> articleList = new ArrayList<>(); // 인스턴스 변수
     ArrayList<Customer> customerList = new ArrayList<>();
     Customer loggedInUser = null;
+
 
     public void run() {
 
@@ -166,19 +168,17 @@ public class BoardApp {
     private void detail() {
 
         System.out.print("상세보기 할 게시물 번호를 입력해주세요 : ");
-        int inputId = Integer.parseInt(scan.nextLine());
+        int inputId = getParamAsInt(scan.nextLine(),WRONG_VALUE);
 
-        int index = findIndexById(inputId);
+        if (inputId == WRONG_VALUE) {
 
-        if (index == -1) {
-            System.out.println("없는 게시물입니다.");
             return;
         }
         if (loggedInUser != null) {
 
             ArrayList<Article> userArticles = loggedInUser.getArticleList();
 
-            Article article = userArticles.get(index);
+            Article article = userArticles.get(inputId);
             article.increaseView();
             ArrayList<Comments> commentsList = article.getComments();
 
@@ -203,7 +203,12 @@ public class BoardApp {
             }
 
             System.out.println("상세보기 기능을 선택해주세요.\n1. 댓글 등록\n2. 추천\n3. 수정\n4. 삭제\n5. 목록으로");
-            int choice = Integer.parseInt(scan.nextLine());
+            int choice = getParamAsInt(scan.nextLine(),WRONG_VALUE);
+
+            if (choice == WRONG_VALUE) {
+
+                return;
+            }
 
             switch (choice) {
                 case 1:
@@ -241,7 +246,7 @@ public class BoardApp {
                     System.out.print("삭제 하시겠습니까? (y/n) : ");
                     String answer = scan.nextLine();
                     if (answer.equals("y")) {
-                        userArticles.remove(index);
+                        userArticles.remove(article);
                         System.out.println(loggedInUser.getNickname() + "님의 " + inputId + "번 게시물을 삭제했습니다.");
                     }
                     else if (answer.equals("n")) {
@@ -254,7 +259,7 @@ public class BoardApp {
             }
         }
         else {
-            Article article = articleList.get(index);
+            Article article = articleList.get(inputId);
             article.increaseView();
             ArrayList<Comments> commentsList = article.getComments();
 
@@ -269,7 +274,7 @@ public class BoardApp {
                 System.out.println("추천수 : " + article.getHit());
             }
             System.out.println("====================");
-            if (commentsList != null) {
+            if (commentsList != null ) {
                 System.out.println("======= 댓글 =======");
                 for (Comments comment : commentsList) {
                     System.out.println("댓글 내용 : " + comment.getComments());
@@ -280,7 +285,12 @@ public class BoardApp {
 
 
             System.out.println("상세보기 기능을 선택해주세요.\n1. 댓글 등록\n2. 추천\n3. 수정\n4. 삭제\n5. 목록으로");
-            int choice = Integer.parseInt(scan.nextLine());
+            int choice = getParamAsInt(scan.nextLine(),WRONG_VALUE);
+
+            if (choice == WRONG_VALUE) {
+
+                return;
+            }
 
             switch (choice) {
                 case 1:
@@ -318,7 +328,7 @@ public class BoardApp {
                     System.out.print("삭제 하시겠습니까? (y/n) : ");
                     String answer = scan.nextLine();
                     if (answer.equals("y")) {
-                        articleList.remove(index);
+                        articleList.remove(article);
                         System.out.println(inputId + "번 게시물을 삭제했습니다.");
                     }
                     else if (answer.equals("n")) {
@@ -337,20 +347,22 @@ public class BoardApp {
 
     private void delete() {
         System.out.print("삭제할 게시물 번호를 입력해주세요 : ");
-        int inputId = Integer.parseInt(scan.nextLine());
+        int inputId = getParamAsInt(scan.nextLine(),WRONG_VALUE);
 
-        int index = findIndexById(inputId);
+        if (inputId == WRONG_VALUE) {
 
-        if (index == -1) {
+            return;
+        }
+        if (inputId == -1) {
             System.out.println("없는 게시물입니다.");
             return;
         }
         if (loggedInUser != null){
             ArrayList<Article> userArticles = loggedInUser.getArticleList();
-            userArticles.remove(index);
+            userArticles.remove(inputId);
         }
         else {
-            articleList.remove(index);
+            articleList.remove(inputId);
         }
 
         System.out.printf("%d번 게시물이 삭제되었습니다.\n", inputId);
@@ -416,7 +428,12 @@ public class BoardApp {
 
     public void update() {
         System.out.print("수정할 게시물 번호를 입력해주세요 : ");
-        int inputId = Integer.parseInt(scan.nextLine());
+        int inputId = getParamAsInt(scan.nextLine(),WRONG_VALUE);
+
+        if (inputId == WRONG_VALUE) {
+
+            return;
+        }
 
         int index = findIndexById(inputId);
         if (index == -1) {
@@ -479,5 +496,24 @@ public class BoardApp {
 
         // 지정한 형식으로 날짜와 시간을 출력합니다.
         return now.format(formatter);
+    }
+    private int getParamAsInt(String param, int defaultValue) {
+        try {
+            return Integer.parseInt(param);
+
+        } catch (NumberFormatException e) {
+
+            System.out.println("숫자를 입력해주세요.");
+            return defaultValue;
+        }
+    }
+    private int paramAsInt (String param, int defaultValue) {
+        try {
+            return Integer.parseInt(scan.nextLine());
+        }
+        catch (NumberFormatException e) {
+            System.out.println("숫자를 입력하세요");
+            return defaultValue;
+        }
     }
 }
