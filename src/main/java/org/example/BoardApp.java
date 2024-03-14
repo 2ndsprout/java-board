@@ -8,15 +8,15 @@ import java.util.Scanner;
 public class BoardApp {
     Scanner scan = new Scanner(System.in);
     int latestArticleId = 4; // 시작 번호를 1로 지정
-    int WRONG_VALUE = -1;
-    ArrayList<Article> articleList = new ArrayList<>(); // 인스턴스 변수
+    int WRONG_VALUE = 0;
+    ArrayList<Article> articleList = new ArrayList<>();
     ArrayList<Customer> customerList = new ArrayList<>();
     Customer loggedInUser = null;
 
 
     public void run() {
 
-        testMask();
+        test();
 
         label:
         while (true) { // 반복 조건이 true 이기 때문에 무한 반복
@@ -87,7 +87,7 @@ public class BoardApp {
             if (customer.getId().equals(id) && customer.getPassword().equals(password)) {
                 loggedInUser = customer;
                 System.out.println(loggedInUser.getNickname() + "님 환영합니다!");
-                testMask();
+                test();
                 return;
             }
         }
@@ -143,7 +143,7 @@ public class BoardApp {
         }
     }
 
-    private void testMask() {
+    private void test() {
 
         Article a1 = new Article(1, "안녕하세요 반갑습니다. 자바 공부중이에요.", "인사", 0, 0, getCurrentDateTime());
         Article a2 = new Article(2, "자바 질문좀 할게요~", "질문", 0, 0, getCurrentDateTime());
@@ -174,11 +174,12 @@ public class BoardApp {
 
             return;
         }
+        int index = findIndexById(inputId);
         if (loggedInUser != null) {
 
             ArrayList<Article> userArticles = loggedInUser.getArticleList();
 
-            Article article = userArticles.get(inputId);
+            Article article = userArticles.get(index);
             article.increaseView();
             ArrayList<Comments> commentsList = article.getComments();
 
@@ -259,7 +260,7 @@ public class BoardApp {
             }
         }
         else {
-            Article article = articleList.get(inputId);
+            Article article = articleList.get(index);
             article.increaseView();
             ArrayList<Comments> commentsList = article.getComments();
 
@@ -475,19 +476,17 @@ public class BoardApp {
                     return i; // 원하는 것은 찾은 즉시 종료.
                 }
             }
-        }
-        else {
+        } else {
             for (int i = 0; i < articleList.size(); i++) {
                 Article article = articleList.get(i);
 
                 if (article.getId() == id) {
-                    return i; // 원하는 것은 찾은 즉시 종료.
+                    return i;
                 }
             }
         }
         return -1;
     }
-
     public String getCurrentDateTime() {
         LocalDateTime now = LocalDateTime.now();
 
@@ -504,15 +503,6 @@ public class BoardApp {
         } catch (NumberFormatException e) {
 
             System.out.println("숫자를 입력해주세요.");
-            return defaultValue;
-        }
-    }
-    private int paramAsInt (String param, int defaultValue) {
-        try {
-            return Integer.parseInt(scan.nextLine());
-        }
-        catch (NumberFormatException e) {
-            System.out.println("숫자를 입력하세요");
             return defaultValue;
         }
     }
